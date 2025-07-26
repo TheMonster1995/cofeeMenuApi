@@ -1,0 +1,75 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Shop {
+  id         Int       @id @default(autoincrement())
+  name       String
+  timeZone   String    @default("UTC")
+  settings   Json      @default("{}")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  users      AppUser[]
+  categories Category[]
+  items      Item[]
+}
+
+model AppUser {
+  id           Int      @id @default(autoincrement())
+  shop         Shop     @relation(fields: [shopId], references: [id])
+  shopId       Int
+  username     String
+  passwordHash String
+  role         String   @default("staff")
+  email        String?
+  phone        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([shopId, username])
+}
+
+model Category {
+  id         Int       @id @default(autoincrement())
+  shop       Shop      @relation(fields: [shopId], references: [id])
+  shopId     Int
+  name       String
+  position   Int       @default(0)
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  items      Item[]
+  @@unique([shopId, name])
+}
+
+model Item {
+  id                Int       @id @default(autoincrement())
+  shop              Shop      @relation(fields: [shopId], references: [id])
+  shopId            Int
+  category          Category? @relation(fields: [categoryId], references: [id])
+  categoryId        Int?
+  name              String
+  description       String?
+  imageUrl          String?
+  priceCents        Int
+  costPriceCents    Int?
+  accountingCode    String?
+  discountPct       Float?
+  discountStart     DateTime?
+  discountEnd       DateTime?
+  stockQuantity     Int?
+  reorderThreshold  Int?
+  tableUrlToken     String?
+  metadata          Json?
+  position          Int       @default(0)
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
