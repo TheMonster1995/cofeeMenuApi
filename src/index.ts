@@ -8,7 +8,7 @@ import typeDefs from "./schema";
 import { createContext } from "./context";
 
 async function start() {
-  const app = express();
+  const app: any = express();
   const schema = makeExecutableSchema({ typeDefs, resolvers });
 
   const server = new ApolloServer({
